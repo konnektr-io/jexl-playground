@@ -1,7 +1,7 @@
 {
   "name": "jexl-playground",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,7 +16,7 @@
     "autoprefixer": "^10.4.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "jexl-extended": "^1.2.4",
+    "jexl-extended": "^1.2.6",
     "lucide-react": "^0.536.0",
     "monaco-editor": "^0.52.2",
     "react": "^19.1.0",
