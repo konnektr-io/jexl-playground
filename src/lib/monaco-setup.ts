@@ -2,7 +2,7 @@ import * as monaco from 'monaco-editor';
 import jexl, { Monaco } from 'jexl-extended';
 
 // Create Monaco editor instances
-export function createJexlEditor(container: HTMLElement, value: string = '') {
+export function createJexlEditor(container: HTMLElement, value: string = ''): monaco.editor.IStandaloneCodeEditor {
   // Use the built-in createJexlEditor function from jexl-extended
   return Monaco.createJexlEditor(monaco, container, {
     value,

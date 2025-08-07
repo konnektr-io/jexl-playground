@@ -27,11 +27,11 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       jexl-extended:
-        specifier: ^1.2.6
-        version: 1.2.6(monaco-editor@0.52.2)
+        specifier: ^1.2.16
+        version: 1.2.16(monaco-editor@0.52.2)
       lucide-react:
-        specifier: ^0.536.0
-        version: 0.536.0(react@19.1.1)
+        specifier: ^0.537.0
+        version: 0.537.0(react@19.1.1)
       monaco-editor:
         specifier: ^0.52.2
         version: 0.52.2
@@ -39,7 +39,7 @@ importers:
         specifier: ^19.1.0
         version: 19.1.1
       react-dom:
-        specifier: ^19.1.0
+        specifier: ^19.1.1
         version: 19.1.1(react@19.1.1)
       react-resizable-panels:
         specifier: ^3.0.4
@@ -1229,8 +1229,8 @@ packages:
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
 
-  jexl-extended@1.2.6:
-    resolution: {integrity: sha512-CCe67gZ8nk8QAjVZK0x6ZOqn1V0cXzGxyoXseTc9ESVrszSdGaycu/1a/Yd6vU+6AUp8oN9+5SWq35ry59QSAQ==}
+  jexl-extended@1.2.16:
+    resolution: {integrity: sha512-l5PrNWQRi85XudjUzrHegFXiV3ocdUE1wMFhgRP06wHAaEv64cOJ8YbVw4wk4rPJmcSny87h2AakypQG2lPbQg==}
     engines: {node: '>= 16.0.0'}
     peerDependencies:
       monaco-editor: '>=0.40.0'
@@ -1352,8 +1352,8 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lucide-react@0.536.0:
-    resolution: {integrity: sha512-2PgvNa9v+qz4Jt/ni8vPLt4jwoFybXHuubQT8fv4iCW5TjDxkbZjNZZHa485ad73NSEn/jdsEtU57eE1g+ma8A==}
+  lucide-react@0.537.0:
+    resolution: {integrity: sha512-VxWsdxBGeFnlC+HwMg/l08HptN4YRU9o/lRog156jOmRxI1ERKqN+rJiNY/mPcKAdWdM0UbyO8ft1o0jq69SSQ==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -2707,7 +2707,7 @@ snapshots:
 
   isexe@2.0.0: {}
 
-  jexl-extended@1.2.6(monaco-editor@0.52.2):
+  jexl-extended@1.2.16(monaco-editor@0.52.2):
     dependencies:
       date-fns: 4.1.0
       jexl: 2.3.0
@@ -2801,7 +2801,7 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lucide-react@0.536.0(react@19.1.1):
+  lucide-react@0.537.0(react@19.1.1):
     dependencies:
       react: 19.1.1
 

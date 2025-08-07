@@ -19,7 +19,7 @@ import {
   evaluateJexl, 
   parseJsonSafely, 
   formatResult
-} from '@/lib/jexl-setup';
+} from '@/lib/monaco-setup';
 import { Copy, Play, RefreshCw, FileText } from 'lucide-react';
 
 // Example data for the playground
@@ -119,6 +119,7 @@ export function Playground() {
   
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [outputType, setOutputType] = useState<string | null>(null);
 
   // Initialize Monaco editors
   useEffect(() => {
@@ -148,6 +149,7 @@ export function Playground() {
   const evaluateExpression = useCallback(async (expression: string, context: any) => {
     setIsEvaluating(true);
     setLastError(null);
+    setOutputType(null);
 
     const { result, error } = await evaluateJexl(expression, context);
     
@@ -161,6 +163,20 @@ export function Playground() {
       outputEditor?.updateOptions({ 
         language: typeof result === 'string' ? 'text' : 'json' 
       });
+      
+      // Determine output type
+      const getTypeInfo = (value: any): string => {
+        if (value === null) return 'null';
+        if (value === undefined) return 'undefined';
+        if (Array.isArray(value)) return `array[${value.length}]`;
+        if (typeof value === 'object') return 'object';
+        if (typeof value === 'string') return `string`;
+        if (typeof value === 'number') return Number.isInteger(value) ? 'integer' : 'number';
+        if (typeof value === 'boolean') return 'boolean';
+        return typeof value;
+      };
+      
+      setOutputType(getTypeInfo(result));
     }
     
     setIsEvaluating(false);
@@ -269,7 +285,7 @@ export function Playground() {
               <div className="space-y-3">
                 {examples.map((example, index) => (
                   <Card key={index} className="group hover:shadow-md transition-shadow">
-                    <CardHeader className="pb-1">
+                    <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <CardTitle className="text-sm font-medium">{example.title}</CardTitle>
@@ -278,8 +294,7 @@ export function Playground() {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button 
-                              size="sm" 
-                              variant="ghost" 
+                              variant="outline"
                               onClick={() => loadExample(example)}
                               className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                             >
@@ -293,7 +308,7 @@ export function Playground() {
                       </div>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <pre className="text-xs bg-muted p-3 rounded text-muted-foreground font-mono overflow-x-auto">
+                      <pre className="text-xs bg-muted p-3 rounded text-muted-foreground font-mono whitespace-pre-wrap break-all">
                         {example.expression}
                       </pre>
                     </CardContent>
@@ -349,6 +364,9 @@ export function Playground() {
                       <h3 className="text-sm font-medium">Output</h3>
                       {lastError && (
                         <span className="text-xs text-destructive">• Error</span>
+                      )}
+                      {!lastError && outputType && (
+                        <span className="text-xs text-muted-foreground">• {outputType}</span>
                       )}
                     </div>
                     <Button onClick={copyResult} size="sm" variant="ghost">
