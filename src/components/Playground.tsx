@@ -226,29 +226,6 @@ export function Playground() {
     };
   }, [jexlEditor, contextEditor, handleEvaluate]);
 
-  // Handle editor resizing when panels change
-  const handlePanelResize = useCallback(() => {
-    // Use requestAnimationFrame to ensure the DOM has updated
-    requestAnimationFrame(() => {
-      jexlEditor?.layout();
-      contextEditor?.layout();
-      outputEditor?.layout();
-    });
-  }, [jexlEditor, contextEditor, outputEditor]);
-
-  // Handle window resize
-  useEffect(() => {
-    const handleWindowResize = () => {
-      handlePanelResize();
-    };
-
-    window.addEventListener('resize', handleWindowResize);
-    
-    return () => {
-      window.removeEventListener('resize', handleWindowResize);
-    };
-  }, [handlePanelResize]);
-
   // Load example
   const loadExample = (example: typeof examples[0]) => {
     if (jexlEditor) {
@@ -347,16 +324,16 @@ export function Playground() {
           <ResizablePanel defaultSize={75}>
             <ResizablePanelGroup direction="vertical" className="h-full">
               {/* Top Row - Input and Context */}
-              <ResizablePanel defaultSize={50} onResize={handlePanelResize}>
+              <ResizablePanel defaultSize={50}>
                 <ResizablePanelGroup direction="horizontal" className="h-full">
                   {/* JEXL Input */}
-                  <ResizablePanel defaultSize={50} onResize={handlePanelResize}>
+                  <ResizablePanel defaultSize={50}>
                     <div className="h-full flex flex-col">
                       <div className="flex-none p-4 border-b">
                         <h3 className="text-sm font-medium">JEXL Expression</h3>
                       </div>
                       <div className="flex-1 p-4">
-                        <div ref={jexlEditorRef} className="h-full rounded-md border overflow-hidden" />
+                        <div ref={jexlEditorRef} className="h-full rounded-md border" />
                       </div>
                     </div>
                   </ResizablePanel>
@@ -364,13 +341,13 @@ export function Playground() {
                   <ResizableHandle />
 
                   {/* Context Input */}
-                  <ResizablePanel defaultSize={50} onResize={handlePanelResize}>
+                  <ResizablePanel defaultSize={50}>
                     <div className="h-full flex flex-col">
                       <div className="flex-none p-4 border-b">
                         <h3 className="text-sm font-medium">Context (JSON)</h3>
                       </div>
                       <div className="flex-1 p-4">
-                        <div ref={contextEditorRef} className="h-full rounded-md border overflow-hidden" />
+                        <div ref={contextEditorRef} className="h-full rounded-md border" />
                       </div>
                     </div>
                   </ResizablePanel>
@@ -380,7 +357,7 @@ export function Playground() {
               <ResizableHandle withHandle />
 
               {/* Bottom Row - Output */}
-              <ResizablePanel defaultSize={50} onResize={handlePanelResize}>
+              <ResizablePanel defaultSize={50}>
                 <div className="h-full flex flex-col">
                   <div className="flex-none p-4 border-b flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -398,7 +375,7 @@ export function Playground() {
                     </Button>
                   </div>
                   <div className="flex-1 p-4">
-                    <div ref={outputEditorRef} className="h-full rounded-md border overflow-hidden" />
+                    <div ref={outputEditorRef} className="h-full rounded-md border" />
                   </div>
                 </div>
               </ResizablePanel>
