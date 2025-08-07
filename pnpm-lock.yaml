@@ -27,8 +27,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       jexl-extended:
-        specifier: ^1.2.16
-        version: 1.2.16(monaco-editor@0.52.2)
+        specifier: ^1.2.18
+        version: 1.2.18(monaco-editor@0.52.2)
       lucide-react:
         specifier: ^0.537.0
         version: 0.537.0(react@19.1.1)
@@ -1229,8 +1229,8 @@ packages:
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
 
-  jexl-extended@1.2.16:
-    resolution: {integrity: sha512-l5PrNWQRi85XudjUzrHegFXiV3ocdUE1wMFhgRP06wHAaEv64cOJ8YbVw4wk4rPJmcSny87h2AakypQG2lPbQg==}
+  jexl-extended@1.2.18:
+    resolution: {integrity: sha512-2wg1zZtveCNGCVNdRT/XwkfA2ssDNFQz6OhZKobt7CG+BEWdgX2E9K3GqWQd8hUB0q1RugVZpYYe+exRbvL/Ew==}
     engines: {node: '>= 16.0.0'}
     peerDependencies:
       monaco-editor: '>=0.40.0'
@@ -2707,7 +2707,7 @@ snapshots:
 
   isexe@2.0.0: {}
 
-  jexl-extended@1.2.16(monaco-editor@0.52.2):
+  jexl-extended@1.2.18(monaco-editor@0.52.2):
     dependencies:
       date-fns: 4.1.0
       jexl: 2.3.0
