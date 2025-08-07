@@ -226,6 +226,29 @@ export function Playground() {
     };
   }, [jexlEditor, contextEditor, handleEvaluate]);
 
+  // Handle editor resizing when panels change
+  const handlePanelResize = useCallback(() => {
+    // Use requestAnimationFrame to ensure the DOM has updated
+    requestAnimationFrame(() => {
+      jexlEditor?.layout();
+      contextEditor?.layout();
+      outputEditor?.layout();
+    });
+  }, [jexlEditor, contextEditor, outputEditor]);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleWindowResize = () => {
+      handlePanelResize();
+    };
+
+    window.addEventListener('resize', handleWindowResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, [handlePanelResize]);
+
   // Load example
   const loadExample = (example: typeof examples[0]) => {
     if (jexlEditor) {
@@ -324,10 +347,10 @@ export function Playground() {
           <ResizablePanel defaultSize={75}>
             <ResizablePanelGroup direction="vertical" className="h-full">
               {/* Top Row - Input and Context */}
-              <ResizablePanel defaultSize={50}>
+              <ResizablePanel defaultSize={50} onResize={handlePanelResize}>
                 <ResizablePanelGroup direction="horizontal" className="h-full">
                   {/* JEXL Input */}
-                  <ResizablePanel defaultSize={50}>
+                  <ResizablePanel defaultSize={50} onResize={handlePanelResize}>
                     <div className="h-full flex flex-col">
                       <div className="flex-none p-4 border-b">
                         <h3 className="text-sm font-medium">JEXL Expression</h3>
@@ -341,7 +364,7 @@ export function Playground() {
                   <ResizableHandle />
 
                   {/* Context Input */}
-                  <ResizablePanel defaultSize={50}>
+                  <ResizablePanel defaultSize={50} onResize={handlePanelResize}>
                     <div className="h-full flex flex-col">
                       <div className="flex-none p-4 border-b">
                         <h3 className="text-sm font-medium">Context (JSON)</h3>
@@ -357,7 +380,7 @@ export function Playground() {
               <ResizableHandle withHandle />
 
               {/* Bottom Row - Output */}
-              <ResizablePanel defaultSize={50}>
+              <ResizablePanel defaultSize={50} onResize={handlePanelResize}>
                 <div className="h-full flex flex-col">
                   <div className="flex-none p-4 border-b flex items-center justify-between">
                     <div className="flex items-center gap-2">
