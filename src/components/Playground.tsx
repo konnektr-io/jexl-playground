@@ -332,7 +332,7 @@ export function Playground() {
                       <div className="flex-none p-4 border-b">
                         <h3 className="text-sm font-medium">JEXL Expression</h3>
                       </div>
-                      <div className="flex-1 p-4">
+                      <div className="p-4" style={{ height: 'calc(100% - 57px)' }}>
                         <div ref={jexlEditorRef} className="h-full rounded-md border" />
                       </div>
                     </div>
@@ -346,7 +346,7 @@ export function Playground() {
                       <div className="flex-none p-4 border-b">
                         <h3 className="text-sm font-medium">Context (JSON)</h3>
                       </div>
-                      <div className="flex-1 p-4">
+                      <div className="p-4" style={{ height: 'calc(100% - 57px)' }}>
                         <div ref={contextEditorRef} className="h-full rounded-md border" />
                       </div>
                     </div>
@@ -374,7 +374,7 @@ export function Playground() {
                       Copy
                     </Button>
                   </div>
-                  <div className="flex-1 p-4">
+                  <div className="p-4" style={{ height: 'calc(100% - 73px)' }}>
                     <div ref={outputEditorRef} className="h-full rounded-md border" />
                   </div>
                 </div>
