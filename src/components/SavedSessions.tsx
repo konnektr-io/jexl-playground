@@ -148,9 +148,9 @@ export function SavedSessions({
               {filteredSessions.map((session) => (
                 <Card 
                   key={session.id} 
-                  className="group hover:shadow-sm transition-shadow"
+                  className="group hover:shadow-sm transition-shadow gap-2"
                 >
-                  <CardHeader className="pb-2">
+                  <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <CardTitle className="text-xs font-medium truncate">
@@ -162,11 +162,11 @@ export function SavedSessions({
                           </p>
                         )}
                       </div>
-                      <div className="flex items-center gap-1 opacity-100 transition-opacity">
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
-                              variant="ghost"
+                              variant="outline"
                               size="sm"
                               className="h-6 w-6 p-0"
                               onClick={(e) => {
@@ -184,7 +184,7 @@ export function SavedSessions({
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
-                              variant="ghost"
+                              variant="outline"
                               size="sm"
                               className="h-6 w-6 p-0 text-destructive hover:text-destructive"
                               onClick={(e) => handleDeleteSession(session.id, e)}

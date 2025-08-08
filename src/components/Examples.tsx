@@ -172,7 +172,7 @@ export function Examples({ onLoadExample }: ExamplesProps) {
       {isExpanded && (
         <div className="space-y-3">
           {examples.map((example, index) => (
-            <Card key={index} className="group">
+            <Card key={index} className="group gap-2">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
