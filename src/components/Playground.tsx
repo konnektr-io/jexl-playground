@@ -1,11 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
-  Tooltip,
-  TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { 
   ResizablePanelGroup,
@@ -21,7 +17,11 @@ import {
   formatResult,
   getJsonPathFromOffset
 } from '@/lib/monaco-setup';
-import { Copy, Play, RefreshCw, FileText } from 'lucide-react';
+import { Play, Copy, RefreshCw, FileText, Check, Clock } from 'lucide-react';
+import { SavedSessions } from './SavedSessions';
+import { Examples } from './Examples';
+import { SaveDialog } from './SaveDialog';
+import { useSavedSessions } from '@/lib/saved-sessions';
 
 // Example data for the playground
 const defaultContext = {
@@ -45,70 +45,6 @@ const defaultContext = {
 
 const defaultExpression = 'users|filter(\'value.active\')|map(\'value.name\')|sort()';
 
-// Example expressions - Real jexl-extended functions
-const examples = [
-  {
-    title: "String Manipulation",
-    expression: '"Hello World"|uppercase|split(" ")|join("-")',
-    description: "Transform string to uppercase and replace spaces with dashes"
-  },
-  {
-    title: "Array Operations", 
-    expression: 'users|filter(\'value.active\')|map(\'value.name\')|sort()',
-    description: "Filter active users and get their names sorted"
-  },
-  {
-    title: "Numeric Aggregations",
-    expression: 'products|map(\'value.price\')|sum',
-    description: "Calculate total price of all products"
-  },
-  {
-    title: "Complex Filtering",
-    expression: 'users|filter(\'value.department == "Engineering" && value.active\')|length',
-    description: "Count active users in Engineering department"
-  },
-  {
-    title: "String Functions",
-    expression: '"hello world"|substringBefore(" ")|uppercase',
-    description: "Extract text before space and convert to uppercase"
-  },
-  {
-    title: "Date Operations",
-    expression: 'now()|dateTimeAdd("days", 7)|dateTimeFormat("yyyy-MM-dd")',
-    description: "Add 7 days to current date and format"
-  },
-  {
-    title: "Object Transformation",
-    expression: '[["name","John"],["age",30]]|toObject',
-    description: "Convert array of key-value pairs to object"
-  },
-  {
-    title: "Base64 Encoding",
-    expression: '"hello world"|base64Encode|base64Decode',
-    description: "Encode to base64 and decode back"
-  },
-  {
-    title: "Boolean Logic",
-    expression: 'users|any(\'value.age > 30\')',
-    description: "Check if any user is older than 30"
-  },
-  {
-    title: "Number Formatting",
-    expression: '16325.62|formatNumber("0,0.000")',
-    description: "Format number with thousands separator and decimals"
-  },
-  {
-    title: "Conditional Case",
-    expression: 'users[0].department|case("Engineering","Tech","Sales","Business","Other")',
-    description: "Use case statement for conditional values"
-  },
-  {
-    title: "Array Reduce",
-    expression: 'users|reduce("accumulator + value.age", 0)',
-    description: "Sum all user ages using reduce"
-  }
-];
-
 export function Playground() {
   const jexlEditorRef = useRef<HTMLDivElement>(null);
   const contextEditorRef = useRef<HTMLDivElement>(null);
@@ -122,6 +58,11 @@ export function Playground() {
   const [lastError, setLastError] = useState<string | null>(null);
   const [outputType, setOutputType] = useState<string | null>(null);
   const [contextPath, setContextPath] = useState<string | null>(null);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+
+  // Saved sessions hook
+  const { sessions, saveSession, deleteSession, loading, autoSaveSession, getAutoSavedSession } = useSavedSessions();
 
   // Initialize Monaco editors
   useEffect(() => {
@@ -133,7 +74,9 @@ export function Playground() {
       contextEditorRef.current, 
       JSON.stringify(defaultContext, null, 2),
       (offset) => {
-        const path = getJsonPathFromOffset(JSON.stringify(defaultContext, null, 2), offset);
+        // Use current editor content for path detection
+        const currentContent = context.getValue();
+        const path = getJsonPathFromOffset(currentContent, offset);
         setContextPath(path);
       }
     );
@@ -153,6 +96,28 @@ export function Playground() {
       output?.dispose();
     };
   }, []);
+
+  // Restore auto-saved session after editors are initialized
+  useEffect(() => {
+    if (!jexlEditor || !contextEditor) return;
+
+    const autoSaved = getAutoSavedSession();
+    if (autoSaved) {
+      // Check if the auto-saved session is recent (within 24 hours)
+      const timeSinceLastSave = Date.now() - autoSaved.lastSaved.getTime();
+      const hoursAgo = timeSinceLastSave / (1000 * 60 * 60);
+      
+      if (hoursAgo < 24) {
+        jexlEditor.setValue(autoSaved.expression);
+        contextEditor.setValue(autoSaved.context);
+        console.log('Restored auto-saved session from', autoSaved.lastSaved.toLocaleString());
+        
+        // Show brief notification that session was restored
+        setAutoSaveStatus('saved');
+        setTimeout(() => setAutoSaveStatus('idle'), 3000);
+      }
+    }
+  }, [jexlEditor, contextEditor, getAutoSavedSession]);
 
   // Debounced evaluation
   const evaluateExpression = useCallback(async (expression: string, context: any) => {
@@ -216,16 +181,50 @@ export function Playground() {
 
     const timeoutId = setTimeout(() => {
       handleEvaluate();
+      // Auto-save after evaluation
+      setAutoSaveStatus('saving');
+      const expression = jexlEditor.getValue();
+      const contextText = contextEditor.getValue();
+      autoSaveSession(expression, contextText);
+      setAutoSaveStatus('saved');
+      
+      // Clear saved status after 2 seconds
+      setTimeout(() => setAutoSaveStatus('idle'), 2000);
     }, 500); // 500ms debounce
 
     const jexlDisposable = jexlEditor.onDidChangeModelContent(() => {
       clearTimeout(timeoutId);
-      setTimeout(handleEvaluate, 500);
+      setTimeout(() => {
+        handleEvaluate();
+        // Auto-save after evaluation
+        setAutoSaveStatus('saving');
+        const expression = jexlEditor.getValue();
+        const contextText = contextEditor.getValue();
+        autoSaveSession(expression, contextText);
+        setAutoSaveStatus('saved');
+        
+        // Clear saved status after 2 seconds
+        setTimeout(() => setAutoSaveStatus('idle'), 2000);
+      }, 500);
     });
 
     const contextDisposable = contextEditor.onDidChangeModelContent(() => {
       clearTimeout(timeoutId);
-      setTimeout(handleEvaluate, 500);
+      setTimeout(() => {
+        handleEvaluate();
+        // Auto-save after evaluation
+        setAutoSaveStatus('saving');
+        const expression = jexlEditor.getValue();
+        const contextText = contextEditor.getValue();
+        autoSaveSession(expression, contextText);
+        setAutoSaveStatus('saved');
+        
+        // Clear saved status after 2 seconds
+        setTimeout(() => setAutoSaveStatus('idle'), 2000);
+      }, 500);
+      
+      // Reset context path when content changes
+      setContextPath(null);
     });
 
     return () => {
@@ -233,14 +232,7 @@ export function Playground() {
       jexlDisposable?.dispose();
       contextDisposable?.dispose();
     };
-  }, [jexlEditor, contextEditor, handleEvaluate]);
-
-  // Load example
-  const loadExample = (example: typeof examples[0]) => {
-    if (jexlEditor) {
-      jexlEditor.setValue(example.expression);
-    }
-  };
+  }, [jexlEditor, contextEditor, handleEvaluate, autoSaveSession]);
 
   // Copy result to clipboard
   const copyResult = async () => {
@@ -257,6 +249,34 @@ export function Playground() {
     setContextPath(null);
   };
 
+  // Handle saving session
+  const handleSaveSession = () => {
+    setShowSaveDialog(true);
+  };
+
+  const handleSaveSessionConfirm = (name: string, description?: string) => {
+    if (jexlEditor && contextEditor) {
+      const expression = jexlEditor.getValue();
+      const context = contextEditor.getValue();
+      saveSession(name, expression, context, description);
+    }
+  };
+
+  // Handle loading session
+  const handleLoadSession = (expression: string, context: string) => {
+    if (jexlEditor && contextEditor) {
+      jexlEditor.setValue(expression);
+      contextEditor.setValue(context);
+      setContextPath(null); // Clear path when loading new session
+    }
+  };
+
+  // Handle deleting session
+  const handleDeleteSession = (sessionId: string) => {
+    console.log('Playground: handleDeleteSession called with:', sessionId);
+    deleteSession(sessionId);
+  };
+
   return (
     <TooltipProvider>
       <div className="h-screen flex flex-col bg-background">
@@ -269,18 +289,34 @@ export function Playground() {
               Interactive playground for JEXL Extended expressions
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button 
-              onClick={handleEvaluate} 
-              disabled={isEvaluating}
-            >
-              {isEvaluating ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-              Evaluate
-            </Button>
-            <Button onClick={resetToDefaults} variant="outline">
-              <FileText className="h-4 w-4" />
-              Reset
-            </Button>
+          <div className="flex items-center gap-4">
+            {/* Auto-save status indicator */}
+            {autoSaveStatus === 'saving' && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Clock className="h-3 w-3" />
+                Saving...
+              </div>
+            )}
+            {autoSaveStatus === 'saved' && (
+              <div className="flex items-center gap-2 text-xs text-green-600">
+                <Check className="h-3 w-3" />
+                Auto-saved
+              </div>
+            )}
+            
+            <div className="flex gap-2">
+              <Button 
+                onClick={handleEvaluate} 
+                disabled={isEvaluating}
+              >
+                {isEvaluating ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                Evaluate
+              </Button>
+              <Button onClick={resetToDefaults} variant="outline">
+                <FileText className="h-4 w-4" />
+                Reset
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -288,43 +324,20 @@ export function Playground() {
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         <ResizablePanelGroup direction="horizontal" className="h-full">
-          {/* Left Panel - Examples */}
+          {/* Left Panel - Saved Sessions & Examples */}
           <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
             <div className="h-full p-6 overflow-y-auto">
-              <h3 className="text-lg font-semibold mb-4">Examples</h3>
-              <div className="space-y-3">
-                {examples.map((example, index) => (
-                  <Card key={index} className="group hover:shadow-md transition-shadow">
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-sm font-medium">{example.title}</CardTitle>
-                          <p className="text-xs text-muted-foreground mt-1">{example.description}</p>
-                        </div>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button 
-                              variant="outline"
-                              onClick={() => loadExample(example)}
-                              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <Play className="h-3 w-3" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Load this example</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <pre className="text-xs bg-muted p-3 rounded text-muted-foreground font-mono whitespace-pre-wrap break-all">
-                        {example.expression}
-                      </pre>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              {/* Saved Sessions */}
+              <SavedSessions 
+                sessions={sessions}
+                loading={loading}
+                onLoadSession={handleLoadSession}
+                onSaveSession={handleSaveSession}
+                onDeleteSession={handleDeleteSession}
+              />
+
+              {/* Examples */}
+              <Examples onLoadExample={handleLoadSession} />
             </div>
           </ResizablePanel>
 
@@ -411,6 +424,15 @@ export function Playground() {
         </ResizablePanelGroup>
         </div>
       </div>
+
+      {/* Save Dialog */}
+      <SaveDialog
+        isOpen={showSaveDialog}
+        onClose={() => setShowSaveDialog(false)}
+        onSave={handleSaveSessionConfirm}
+        currentExpression={jexlEditor?.getValue() || ''}
+        currentContext={contextEditor?.getValue() || ''}
+      />
     </TooltipProvider>
   );
 }
