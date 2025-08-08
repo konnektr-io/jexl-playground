@@ -254,6 +254,7 @@ export function Playground() {
   const resetToDefaults = () => {
     if (jexlEditor) jexlEditor.setValue(defaultExpression);
     if (contextEditor) contextEditor.setValue(JSON.stringify(defaultContext, null, 2));
+    setContextPath(null);
   };
 
   return (
@@ -338,7 +339,7 @@ export function Playground() {
                   {/* JEXL Input */}
                   <ResizablePanel defaultSize={50}>
                     <div className="h-full flex flex-col">
-                      <div className="flex-none p-4 border-b">
+                      <div className="flex-none p-4 border-b h-[57px]">
                         <h3 className="text-sm font-medium">JEXL Expression</h3>
                       </div>
                       <div className="p-4" style={{ height: 'calc(100% - 57px)' }}>
@@ -352,7 +353,7 @@ export function Playground() {
                   {/* Context Input */}
                   <ResizablePanel defaultSize={50}>
                     <div className="h-full flex flex-col">
-                      <div className="flex-none p-4 border-b flex items-center justify-between">
+                      <div className="flex-none p-4 border-b flex items-center justify-between h-[57px]">
                         <div className="flex items-center gap-2">
                           <h3 className="text-sm font-medium">Context (JSON)</h3>
                           {contextPath && (
@@ -363,7 +364,7 @@ export function Playground() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-6 px-2"
+                            className="h-5 px-1.5"
                             onClick={async () => {
                               await navigator.clipboard.writeText(contextPath);
                             }}
