@@ -18,7 +18,8 @@ import {
   createReadOnlyEditor, 
   evaluateJexl, 
   parseJsonSafely, 
-  formatResult
+  formatResult,
+  getJsonPathFromOffset
 } from '@/lib/monaco-setup';
 import { Copy, Play, RefreshCw, FileText } from 'lucide-react';
 
@@ -120,6 +121,7 @@ export function Playground() {
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
   const [outputType, setOutputType] = useState<string | null>(null);
+  const [contextPath, setContextPath] = useState<string | null>(null);
 
   // Initialize Monaco editors
   useEffect(() => {
@@ -127,7 +129,14 @@ export function Playground() {
 
     // Create editors
     const jexl = createJexlEditor(jexlEditorRef.current, defaultExpression);
-    const context = createJsonEditor(contextEditorRef.current, JSON.stringify(defaultContext, null, 2));
+    const context = createJsonEditor(
+      contextEditorRef.current, 
+      JSON.stringify(defaultContext, null, 2),
+      (offset) => {
+        const path = getJsonPathFromOffset(JSON.stringify(defaultContext, null, 2), offset);
+        setContextPath(path);
+      }
+    );
     const output = createReadOnlyEditor(outputEditorRef.current, '', 'json');
 
     setJexlEditor(jexl);
@@ -343,8 +352,25 @@ export function Playground() {
                   {/* Context Input */}
                   <ResizablePanel defaultSize={50}>
                     <div className="h-full flex flex-col">
-                      <div className="flex-none p-4 border-b">
-                        <h3 className="text-sm font-medium">Context (JSON)</h3>
+                      <div className="flex-none p-4 border-b flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-medium">Context (JSON)</h3>
+                          {contextPath && (
+                            <span className="text-xs text-muted-foreground">• {contextPath}</span>
+                          )}
+                        </div>
+                        {contextPath && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 px-2"
+                            onClick={async () => {
+                              await navigator.clipboard.writeText(contextPath);
+                            }}
+                          >
+                            <Copy className="h-3 w-3" />
+                          </Button>
+                        )}
                       </div>
                       <div className="p-4" style={{ height: 'calc(100% - 57px)' }}>
                         <div ref={contextEditorRef} className="h-full rounded-md border" />

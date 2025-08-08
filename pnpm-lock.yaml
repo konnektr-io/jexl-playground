@@ -27,8 +27,11 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       jexl-extended:
-        specifier: ^1.2.18
-        version: 1.2.18(monaco-editor@0.52.2)
+        specifier: ^1.2.19
+        version: 1.2.19(monaco-editor@0.52.2)
+      jsonc-parser:
+        specifier: ^3.3.1
+        version: 3.3.1
       lucide-react:
         specifier: ^0.537.0
         version: 0.537.0(react@19.1.1)
@@ -1229,8 +1232,8 @@ packages:
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
 
-  jexl-extended@1.2.18:
-    resolution: {integrity: sha512-2wg1zZtveCNGCVNdRT/XwkfA2ssDNFQz6OhZKobt7CG+BEWdgX2E9K3GqWQd8hUB0q1RugVZpYYe+exRbvL/Ew==}
+  jexl-extended@1.2.19:
+    resolution: {integrity: sha512-Nvbx849XPS/lahNX6ykG8SX2F6mmhQ3lW6x3HSdkdaWL1e6Bb5bCfG4/jO2WhC2II4wmv0IPoirnngoyFe99gA==}
     engines: {node: '>= 16.0.0'}
     peerDependencies:
       monaco-editor: '>=0.40.0'
@@ -1270,6 +1273,9 @@ packages:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
     engines: {node: '>=6'}
     hasBin: true
+
+  jsonc-parser@3.3.1:
+    resolution: {integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==}
 
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
@@ -2707,7 +2713,7 @@ snapshots:
 
   isexe@2.0.0: {}
 
-  jexl-extended@1.2.18(monaco-editor@0.52.2):
+  jexl-extended@1.2.19(monaco-editor@0.52.2):
     dependencies:
       date-fns: 4.1.0
       jexl: 2.3.0
@@ -2736,6 +2742,8 @@ snapshots:
   json-stable-stringify-without-jsonify@1.0.1: {}
 
   json5@2.2.3: {}
+
+  jsonc-parser@3.3.1: {}
 
   keyv@4.5.4:
     dependencies:

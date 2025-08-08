@@ -1,5 +1,6 @@
 import * as monaco from 'monaco-editor';
 import jexl, { Monaco } from 'jexl-extended';
+import { getLocation } from 'jsonc-parser';
 
 // Create Monaco editor instances
 export function createJexlEditor(container: HTMLElement, value: string = ''): monaco.editor.IStandaloneCodeEditor {
@@ -21,8 +22,8 @@ export function createJexlEditor(container: HTMLElement, value: string = ''): mo
   });
 }
 
-export function createJsonEditor(container: HTMLElement, value: string = '') {
-  return monaco.editor.create(container, {
+export function createJsonEditor(container: HTMLElement, value: string = '', onOffsetClick?: (offset: number) => void) {
+  const editor = monaco.editor.create(container, {
     value,
     language: 'json',
     theme: 'vs', // Light theme to match shadcn styling
@@ -36,6 +37,21 @@ export function createJsonEditor(container: HTMLElement, value: string = '') {
     formatOnPaste: true,
     formatOnType: true,
   });
+  
+  // Add click handler for path detection
+  if (onOffsetClick) {
+    editor.onMouseDown((e) => {
+      if (e.target.position) {
+        const model = editor.getModel();
+        if (model) {
+          const offset = model.getOffsetAt(e.target.position);
+          onOffsetClick(offset);
+        }
+      }
+    });
+  }
+  
+  return editor;
 }
 
 export function createReadOnlyEditor(container: HTMLElement, value: string = '', language: string = 'json') {
@@ -92,5 +108,26 @@ export function formatResult(result: any): string {
     return JSON.stringify(result, null, 2);
   } catch {
     return String(result);
+  }
+}
+
+// Get JSON path from offset (adapted from your Vue.js code)
+export function getJsonPathFromOffset(jsonString: string, offset: number): string | null {
+  try {
+    const location = getLocation(jsonString, offset);
+    
+    if (!location || !location.path) return null;
+    
+    // Convert path segments to JEXL path
+    return location.path.reduce<string>((prevPath, pathSeg, index) => {
+      if (typeof pathSeg === 'number') return `${prevPath}[${pathSeg}]`;
+      // Check if pathSeg includes special characters (with regex)
+      else if (/[`~!@#%^&*()|+\\\-=?;:'.,\s']/g.test(pathSeg)) return `${prevPath}['${pathSeg}']`;
+      else if (index === 0) return pathSeg;
+      else if (pathSeg.length === 0) return prevPath;
+      else return `${prevPath}.${pathSeg}`;
+    }, '');
+  } catch {
+    return null;
   }
 }
