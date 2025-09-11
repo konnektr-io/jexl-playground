@@ -18,6 +18,7 @@ import {
   getJsonPathFromOffset
 } from '@/lib/monaco-setup';
 import { Play, Copy, RefreshCw, FileText, Check, Clock } from 'lucide-react';
+import { SiGithub } from '@icons-pack/react-simple-icons';
 import { SavedSessions } from './SavedSessions';
 import { Examples } from './Examples';
 import { SaveDialog } from './SaveDialog';
@@ -288,6 +289,26 @@ export function Playground() {
             <p className="text-muted-foreground">
               Interactive playground for JEXL Extended expressions
             </p>
+            <div className="flex items-center gap-4 mt-2">
+              <a
+                href="https://github.com/nikoraes/jexl-playground"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <SiGithub className="h-3 w-3" />
+                Playground Source
+              </a>
+              <a
+                href="https://github.com/nikoraes/jexl-extended"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <SiGithub className="h-3 w-3" />
+                JEXL Extended Library
+              </a>
+            </div>
           </div>
           <div className="flex items-center gap-4">
             {/* Auto-save status indicator */}
