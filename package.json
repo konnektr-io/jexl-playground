@@ -16,7 +16,7 @@
     "autoprefixer": "^10.4.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "jexl-extended": "^1.2.22",
+    "jexl-extended": "^1.2.23",
     "jsonc-parser": "^3.3.1",
     "lucide-react": "^0.544.0",
     "monaco-editor": "^0.53.0",
