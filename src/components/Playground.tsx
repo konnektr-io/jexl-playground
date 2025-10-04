@@ -281,168 +281,204 @@ export function Playground() {
   return (
     <TooltipProvider>
       <div className="h-screen flex flex-col bg-background">
-      {/* Header */}
-      <div className="flex-none border-b p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">JEXL Playground</h1>
-            <p className="text-muted-foreground">
-              Interactive playground for JEXL Extended expressions
-            </p>
-            <div className="flex items-center gap-4 mt-2">
-              <a
-                href="https://github.com/nikoraes/jexl-playground"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <SiGithub className="h-3 w-3" />
-                Playground Source
-              </a>
-              <a
-                href="https://github.com/nikoraes/jexl-extended"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <SiGithub className="h-3 w-3" />
-                JEXL Extended Library
-              </a>
+        {/* Header */}
+        <div className="flex-none border-b p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">
+                JEXL Playground
+              </h1>
+              <p className="text-muted-foreground">
+                Interactive playground for JEXL Extended expressions
+              </p>
+              <div className="flex items-center gap-4 mt-2">
+                <a
+                  href="https://github.com/konnektr-io/jexl-playground"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <SiGithub className="h-3 w-3" />
+                  Playground Source
+                </a>
+                <a
+                  href="https://github.com/konnektr-io/jexl-extended"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <SiGithub className="h-3 w-3" />
+                  JEXL Extended Library
+                </a>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-4">
-            {/* Auto-save status indicator */}
-            {autoSaveStatus === 'saving' && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Clock className="h-3 w-3" />
-                Saving...
+            <div className="flex items-center gap-4">
+              {/* Auto-save status indicator */}
+              {autoSaveStatus === "saving" && (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Clock className="h-3 w-3" />
+                  Saving...
+                </div>
+              )}
+              {autoSaveStatus === "saved" && (
+                <div className="flex items-center gap-2 text-xs text-green-600">
+                  <Check className="h-3 w-3" />
+                  Auto-saved
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <Button onClick={handleEvaluate} disabled={isEvaluating}>
+                  {isEvaluating ? (
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Play className="h-4 w-4" />
+                  )}
+                  Evaluate
+                </Button>
+                <Button onClick={resetToDefaults} variant="outline">
+                  <FileText className="h-4 w-4" />
+                  Reset
+                </Button>
               </div>
-            )}
-            {autoSaveStatus === 'saved' && (
-              <div className="flex items-center gap-2 text-xs text-green-600">
-                <Check className="h-3 w-3" />
-                Auto-saved
-              </div>
-            )}
-            
-            <div className="flex gap-2">
-              <Button 
-                onClick={handleEvaluate} 
-                disabled={isEvaluating}
-              >
-                {isEvaluating ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-                Evaluate
-              </Button>
-              <Button onClick={resetToDefaults} variant="outline">
-                <FileText className="h-4 w-4" />
-                Reset
-              </Button>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-hidden">
-        <ResizablePanelGroup direction="horizontal" className="h-full">
-          {/* Left Panel - Saved Sessions & Examples */}
-          <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
-            <div className="h-full p-6 overflow-y-auto">
-              {/* Saved Sessions */}
-              <SavedSessions 
-                sessions={sessions}
-                loading={loading}
-                onLoadSession={handleLoadSession}
-                onSaveSession={handleSaveSession}
-                onDeleteSession={handleDeleteSession}
-              />
+        {/* Main Content */}
+        <div className="flex-1 overflow-hidden">
+          <ResizablePanelGroup direction="horizontal" className="h-full">
+            {/* Left Panel - Saved Sessions & Examples */}
+            <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
+              <div className="h-full p-6 overflow-y-auto">
+                {/* Saved Sessions */}
+                <SavedSessions
+                  sessions={sessions}
+                  loading={loading}
+                  onLoadSession={handleLoadSession}
+                  onSaveSession={handleSaveSession}
+                  onDeleteSession={handleDeleteSession}
+                />
 
-              {/* Examples */}
-              <Examples onLoadExample={handleLoadSession} />
-            </div>
-          </ResizablePanel>
+                {/* Examples */}
+                <Examples onLoadExample={handleLoadSession} />
+              </div>
+            </ResizablePanel>
 
-          <ResizableHandle withHandle />
+            <ResizableHandle withHandle />
 
-          {/* Right Panel - Editors */}
-          <ResizablePanel defaultSize={75}>
-            <ResizablePanelGroup direction="vertical" className="h-full">
-              {/* Top Row - Input and Context */}
-              <ResizablePanel defaultSize={50}>
-                <ResizablePanelGroup direction="horizontal" className="h-full">
-                  {/* JEXL Input */}
-                  <ResizablePanel defaultSize={50}>
-                    <div className="h-full flex flex-col">
-                      <div className="flex-none p-4 border-b h-[57px]">
-                        <h3 className="text-sm font-medium">JEXL Expression</h3>
+            {/* Right Panel - Editors */}
+            <ResizablePanel defaultSize={75}>
+              <ResizablePanelGroup direction="vertical" className="h-full">
+                {/* Top Row - Input and Context */}
+                <ResizablePanel defaultSize={50}>
+                  <ResizablePanelGroup
+                    direction="horizontal"
+                    className="h-full"
+                  >
+                    {/* JEXL Input */}
+                    <ResizablePanel defaultSize={50}>
+                      <div className="h-full flex flex-col">
+                        <div className="flex-none p-4 border-b h-[57px]">
+                          <h3 className="text-sm font-medium">
+                            JEXL Expression
+                          </h3>
+                        </div>
+                        <div
+                          className="p-4"
+                          style={{ height: "calc(100% - 57px)" }}
+                        >
+                          <div
+                            ref={jexlEditorRef}
+                            className="h-full rounded-md border"
+                          />
+                        </div>
                       </div>
-                      <div className="p-4" style={{ height: 'calc(100% - 57px)' }}>
-                        <div ref={jexlEditorRef} className="h-full rounded-md border" />
-                      </div>
-                    </div>
-                  </ResizablePanel>
+                    </ResizablePanel>
 
-                  <ResizableHandle />
+                    <ResizableHandle />
 
-                  {/* Context Input */}
-                  <ResizablePanel defaultSize={50}>
-                    <div className="h-full flex flex-col">
-                      <div className="flex-none p-4 border-b flex items-center justify-between h-[57px]">
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-medium">Context (JSON)</h3>
+                    {/* Context Input */}
+                    <ResizablePanel defaultSize={50}>
+                      <div className="h-full flex flex-col">
+                        <div className="flex-none p-4 border-b flex items-center justify-between h-[57px]">
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-sm font-medium">
+                              Context (JSON)
+                            </h3>
+                            {contextPath && (
+                              <span className="text-xs text-muted-foreground">
+                                • {contextPath}
+                              </span>
+                            )}
+                          </div>
                           {contextPath && (
-                            <span className="text-xs text-muted-foreground">• {contextPath}</span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-5 px-1.5"
+                              onClick={async () => {
+                                await navigator.clipboard.writeText(
+                                  contextPath
+                                );
+                              }}
+                            >
+                              <Copy className="h-3 w-3" />
+                            </Button>
                           )}
                         </div>
-                        {contextPath && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-5 px-1.5"
-                            onClick={async () => {
-                              await navigator.clipboard.writeText(contextPath);
-                            }}
-                          >
-                            <Copy className="h-3 w-3" />
-                          </Button>
+                        <div
+                          className="p-4"
+                          style={{ height: "calc(100% - 57px)" }}
+                        >
+                          <div
+                            ref={contextEditorRef}
+                            className="h-full rounded-md border"
+                          />
+                        </div>
+                      </div>
+                    </ResizablePanel>
+                  </ResizablePanelGroup>
+                </ResizablePanel>
+
+                <ResizableHandle withHandle />
+
+                {/* Bottom Row - Output */}
+                <ResizablePanel defaultSize={50}>
+                  <div className="h-full flex flex-col">
+                    <div className="flex-none p-4 border-b flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-medium">Output</h3>
+                        {lastError && (
+                          <span className="text-xs text-destructive">
+                            • Error
+                          </span>
+                        )}
+                        {!lastError && outputType && (
+                          <span className="text-xs text-muted-foreground">
+                            • {outputType}
+                          </span>
                         )}
                       </div>
-                      <div className="p-4" style={{ height: 'calc(100% - 57px)' }}>
-                        <div ref={contextEditorRef} className="h-full rounded-md border" />
-                      </div>
+                      <Button onClick={copyResult} size="sm" variant="ghost">
+                        <Copy className="h-4 w-4" />
+                        Copy
+                      </Button>
                     </div>
-                  </ResizablePanel>
-                </ResizablePanelGroup>
-              </ResizablePanel>
-
-              <ResizableHandle withHandle />
-
-              {/* Bottom Row - Output */}
-              <ResizablePanel defaultSize={50}>
-                <div className="h-full flex flex-col">
-                  <div className="flex-none p-4 border-b flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-medium">Output</h3>
-                      {lastError && (
-                        <span className="text-xs text-destructive">• Error</span>
-                      )}
-                      {!lastError && outputType && (
-                        <span className="text-xs text-muted-foreground">• {outputType}</span>
-                      )}
+                    <div
+                      className="p-4"
+                      style={{ height: "calc(100% - 73px)" }}
+                    >
+                      <div
+                        ref={outputEditorRef}
+                        className="h-full rounded-md border"
+                      />
                     </div>
-                    <Button onClick={copyResult} size="sm" variant="ghost">
-                      <Copy className="h-4 w-4" />
-                      Copy
-                    </Button>
                   </div>
-                  <div className="p-4" style={{ height: 'calc(100% - 73px)' }}>
-                    <div ref={outputEditorRef} className="h-full rounded-md border" />
-                  </div>
-                </div>
-              </ResizablePanel>
-            </ResizablePanelGroup>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+                </ResizablePanel>
+              </ResizablePanelGroup>
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </div>
       </div>
 
@@ -451,8 +487,8 @@ export function Playground() {
         isOpen={showSaveDialog}
         onClose={() => setShowSaveDialog(false)}
         onSave={handleSaveSessionConfirm}
-        currentExpression={jexlEditor?.getValue() || ''}
-        currentContext={contextEditor?.getValue() || ''}
+        currentExpression={jexlEditor?.getValue() || ""}
+        currentContext={contextEditor?.getValue() || ""}
       />
     </TooltipProvider>
   );
