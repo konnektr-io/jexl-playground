@@ -2,8 +2,6 @@
 
 An interactive web-based playground for testing and exploring [JEXL Extended](https://github.com/nikoraes/jexl-extended) expressions. Built with React, TypeScript, Monaco Editor, and shadcn/ui.
 
-![JEXL Playground Screenshot](https://via.placeholder.com/800x400/f8f9fa/6c757d?text=JEXL+Playground+Screenshot)
-
 ## 🚀 Features
 
 - **Interactive Monaco Editor** with full JEXL syntax highlighting and IntelliSense
