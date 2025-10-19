@@ -293,6 +293,15 @@ export function Playground() {
               </p>
               <div className="flex items-center gap-4 mt-2">
                 <a
+                  href="https://docs.konnektr.io/docs/jexl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <FileText className="h-3 w-3" />
+                  Documentation
+                </a>
+                <a
                   href="https://github.com/konnektr-io/jexl-playground"
                   target="_blank"
                   rel="noopener noreferrer"

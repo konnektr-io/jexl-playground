@@ -11,4 +11,7 @@ export default defineConfig({
       "@": resolve(__dirname, "./src"),
     },
   },
+  define: {
+    "%VITE_GTAG_ID%": JSON.stringify(process.env.VITE_GTAG_ID || ""),
+  },
 });

@@ -12,6 +12,28 @@
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <script>
+      (function() {
+        const gtagId = '%VITE_GTAG_ID%';
+        if (gtagId && gtagId !== '%VITE' + '_GTAG_ID%') {
+          // Dynamically load gtag script
+          const script = document.createElement('script');
+          script.async = true;
+          script.src = 'https://www.googletagmanager.com/gtag/js?id=' + gtagId;
+          document.head.appendChild(script);
+          
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          window.gtag = gtag;
+          gtag('js', new Date());
+          gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'analytics_storage': 'denied'
+          });
+          gtag('config', gtagId);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
