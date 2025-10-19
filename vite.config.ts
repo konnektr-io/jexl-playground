@@ -2,16 +2,24 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { resolve } from 'path'
+import { VitePluginRadar } from "vite-plugin-radar";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    VitePluginRadar({
+      gtm: [
+        {
+          id: process.env.VITE_GTM_ID || "",
+        },
+      ],
+    }),
+  ],
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),
     },
-  },
-  define: {
-    "%VITE_GTAG_ID%": JSON.stringify(process.env.VITE_GTAG_ID || ""),
   },
 });

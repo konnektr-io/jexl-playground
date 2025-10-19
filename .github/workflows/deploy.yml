@@ -51,12 +51,12 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
-        
+
       - name: Build
         run: pnpm run build
         env:
           NODE_ENV: production
-          VITE_GTAG_ID: ${{ secrets.GTAG }}
+          VITE_GTM_ID: ${{ secrets.GTAG }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
