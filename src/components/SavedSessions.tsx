@@ -121,11 +121,7 @@ export function SavedSessions({
         </button>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              onClick={onSaveSession}
-              size="sm"
-              className="h-8 w-8 p-0"
-            >
+            <Button onClick={onSaveSession} size="sm" className="h-8 w-8 p-0">
               <Save className="h-3 w-3" />
             </Button>
           </TooltipTrigger>
@@ -145,7 +141,9 @@ export function SavedSessions({
               <Input
                 placeholder="Search sessions..."
                 value={searchQuery}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setSearchQuery(e.target.value)
+                }
                 className="pl-9 h-8 text-xs"
               />
             </div>
@@ -154,16 +152,15 @@ export function SavedSessions({
           {/* Sessions List */}
           {filteredSessions.length === 0 ? (
             <div className="text-xs text-muted-foreground text-center py-4 border border-dashed rounded-md">
-              {sessions.length === 0 
-                ? 'No saved sessions yet. Click the save button to store your current expression and context.'
-                : 'No sessions match your search.'
-              }
+              {sessions.length === 0
+                ? "No saved sessions yet. Click the save button to store your current expression and context."
+                : "No sessions match your search."}
             </div>
           ) : (
             <div className="space-y-2">
               {filteredSessions.map((session) => (
-                <Card 
-                  key={session.id} 
+                <Card
+                  key={session.id}
                   className="group hover:shadow-sm transition-shadow gap-2"
                 >
                   <CardHeader>
@@ -203,8 +200,10 @@ export function SavedSessions({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-6 w-6 p-0 text-blue-600 hover:text-blue-600"
-                                onClick={(e) => handleUpdateSession(session.id, e)}
+                                className="h-6 w-6 p-0 text-primary-600 hover:text-primary-600"
+                                onClick={(e) =>
+                                  handleUpdateSession(session.id, e)
+                                }
                               >
                                 <RefreshCw className="h-3 w-3" />
                               </Button>
@@ -220,7 +219,9 @@ export function SavedSessions({
                               variant="outline"
                               size="sm"
                               className="h-6 w-6 p-0 text-destructive hover:text-destructive"
-                              onClick={(e) => handleDeleteSession(session.id, e)}
+                              onClick={(e) =>
+                                handleDeleteSession(session.id, e)
+                              }
                             >
                               <Trash2 className="h-3 w-3" />
                             </Button>
@@ -242,7 +243,10 @@ export function SavedSessions({
                         {session.tags && session.tags.length > 0 && (
                           <div className="flex gap-1">
                             {session.tags.slice(0, 2).map((tag, index) => (
-                              <span key={index} className="bg-muted px-1 py-0.5 rounded text-xs">
+                              <span
+                                key={index}
+                                className="bg-muted px-1 py-0.5 rounded text-xs"
+                              >
                                 {tag}
                               </span>
                             ))}
