@@ -13,7 +13,8 @@ import {
   Play, 
   Trash2, 
   ChevronDown, 
-  ChevronRight 
+  ChevronRight,
+  RefreshCw 
 } from 'lucide-react';
 import { type SavedSession } from '@/lib/saved-sessions';
 
@@ -23,6 +24,9 @@ interface SavedSessionsProps {
   onLoadSession: (expression: string, context: string) => void;
   onSaveSession: () => void;
   onDeleteSession: (sessionId: string) => void;
+  onUpdateSession: (sessionId: string, expression: string, context: string) => void;
+  currentExpression: string;
+  currentContext: string;
 }
 
 export function SavedSessions({ 
@@ -30,7 +34,10 @@ export function SavedSessions({
   loading, 
   onLoadSession, 
   onSaveSession, 
-  onDeleteSession 
+  onDeleteSession,
+  onUpdateSession,
+  currentExpression,
+  currentContext
 }: SavedSessionsProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -52,6 +59,15 @@ export function SavedSessions({
     // Temporarily remove confirm dialog for testing
     console.log('Calling onDeleteSession for session:', sessionId);
     onDeleteSession(sessionId);
+  };
+
+  const handleUpdateSession = (sessionId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    onUpdateSession(sessionId, currentExpression, currentContext);
+  };
+
+  const isSessionDifferent = (session: SavedSession): boolean => {
+    return session.expression !== currentExpression || session.context !== currentContext;
   };
 
   const truncateExpression = (expression: string, maxLength: number = 40) => {
@@ -181,6 +197,23 @@ export function SavedSessions({
                             <p>Load this session</p>
                           </TooltipContent>
                         </Tooltip>
+                        {isSessionDifferent(session) && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-6 w-6 p-0 text-blue-600 hover:text-blue-600"
+                                onClick={(e) => handleUpdateSession(session.id, e)}
+                              >
+                                <RefreshCw className="h-3 w-3" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Update with current expression & context</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button

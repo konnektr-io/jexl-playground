@@ -63,16 +63,29 @@ export function Playground() {
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
   // Saved sessions hook
-  const { sessions, saveSession, deleteSession, loading, autoSaveSession, getAutoSavedSession } = useSavedSessions();
+  const {
+    sessions,
+    saveSession,
+    deleteSession,
+    loading,
+    autoSaveSession,
+    getAutoSavedSession,
+    updateSession,
+  } = useSavedSessions();
 
   // Initialize Monaco editors
   useEffect(() => {
-    if (!jexlEditorRef.current || !contextEditorRef.current || !outputEditorRef.current) return;
+    if (
+      !jexlEditorRef.current ||
+      !contextEditorRef.current ||
+      !outputEditorRef.current
+    )
+      return;
 
     // Create editors
     const jexl = createJexlEditor(jexlEditorRef.current, defaultExpression);
     const context = createJsonEditor(
-      contextEditorRef.current, 
+      contextEditorRef.current,
       JSON.stringify(defaultContext, null, 2),
       (offset) => {
         // Use current editor content for path detection
@@ -81,7 +94,7 @@ export function Playground() {
         setContextPath(path);
       }
     );
-    const output = createReadOnlyEditor(outputEditorRef.current, '', 'json');
+    const output = createReadOnlyEditor(outputEditorRef.current, "", "json");
 
     setJexlEditor(jexl);
     setContextEditor(context);
@@ -107,55 +120,62 @@ export function Playground() {
       // Check if the auto-saved session is recent (within 24 hours)
       const timeSinceLastSave = Date.now() - autoSaved.lastSaved.getTime();
       const hoursAgo = timeSinceLastSave / (1000 * 60 * 60);
-      
+
       if (hoursAgo < 24) {
         jexlEditor.setValue(autoSaved.expression);
         contextEditor.setValue(autoSaved.context);
-        console.log('Restored auto-saved session from', autoSaved.lastSaved.toLocaleString());
-        
+        console.log(
+          "Restored auto-saved session from",
+          autoSaved.lastSaved.toLocaleString()
+        );
+
         // Show brief notification that session was restored
-        setAutoSaveStatus('saved');
-        setTimeout(() => setAutoSaveStatus('idle'), 3000);
+        setAutoSaveStatus("saved");
+        setTimeout(() => setAutoSaveStatus("idle"), 3000);
       }
     }
   }, [jexlEditor, contextEditor, getAutoSavedSession]);
 
   // Debounced evaluation
-  const evaluateExpression = useCallback(async (expression: string, context: any) => {
-    setIsEvaluating(true);
-    setLastError(null);
-    setOutputType(null);
+  const evaluateExpression = useCallback(
+    async (expression: string, context: any) => {
+      setIsEvaluating(true);
+      setLastError(null);
+      setOutputType(null);
 
-    const { result, error } = await evaluateJexl(expression, context);
-    
-    if (error) {
-      setLastError(error);
-      outputEditor?.setValue(`Error: ${error}`);
-      outputEditor?.updateOptions({ language: 'text' });
-    } else {
-      const formattedResult = formatResult(result);
-      outputEditor?.setValue(formattedResult);
-      outputEditor?.updateOptions({ 
-        language: typeof result === 'string' ? 'text' : 'json' 
-      });
-      
-      // Determine output type
-      const getTypeInfo = (value: any): string => {
-        if (value === null) return 'null';
-        if (value === undefined) return 'undefined';
-        if (Array.isArray(value)) return `array[${value.length}]`;
-        if (typeof value === 'object') return 'object';
-        if (typeof value === 'string') return `string`;
-        if (typeof value === 'number') return Number.isInteger(value) ? 'integer' : 'number';
-        if (typeof value === 'boolean') return 'boolean';
-        return typeof value;
-      };
-      
-      setOutputType(getTypeInfo(result));
-    }
-    
-    setIsEvaluating(false);
-  }, [outputEditor]);
+      const { result, error } = await evaluateJexl(expression, context);
+
+      if (error) {
+        setLastError(error);
+        outputEditor?.setValue(`Error: ${error}`);
+        outputEditor?.updateOptions({ language: "text" });
+      } else {
+        const formattedResult = formatResult(result);
+        outputEditor?.setValue(formattedResult);
+        outputEditor?.updateOptions({
+          language: typeof result === "string" ? "text" : "json",
+        });
+
+        // Determine output type
+        const getTypeInfo = (value: any): string => {
+          if (value === null) return "null";
+          if (value === undefined) return "undefined";
+          if (Array.isArray(value)) return `array[${value.length}]`;
+          if (typeof value === "object") return "object";
+          if (typeof value === "string") return `string`;
+          if (typeof value === "number")
+            return Number.isInteger(value) ? "integer" : "number";
+          if (typeof value === "boolean") return "boolean";
+          return typeof value;
+        };
+
+        setOutputType(getTypeInfo(result));
+      }
+
+      setIsEvaluating(false);
+    },
+    [outputEditor]
+  );
 
   // Handle manual evaluation
   const handleEvaluate = useCallback(async () => {
@@ -164,12 +184,13 @@ export function Playground() {
     const expression = jexlEditor.getValue();
     const contextText = contextEditor.getValue();
 
-    const { data: contextData, error: contextError } = parseJsonSafely(contextText);
-    
+    const { data: contextData, error: contextError } =
+      parseJsonSafely(contextText);
+
     if (contextError) {
       setLastError(`Invalid JSON context: ${contextError}`);
       outputEditor?.setValue(`Error: Invalid JSON context - ${contextError}`);
-      outputEditor?.updateOptions({ language: 'text' });
+      outputEditor?.updateOptions({ language: "text" });
       return;
     }
 
@@ -183,14 +204,14 @@ export function Playground() {
     const timeoutId = setTimeout(() => {
       handleEvaluate();
       // Auto-save after evaluation
-      setAutoSaveStatus('saving');
+      setAutoSaveStatus("saving");
       const expression = jexlEditor.getValue();
       const contextText = contextEditor.getValue();
       autoSaveSession(expression, contextText);
-      setAutoSaveStatus('saved');
-      
+      setAutoSaveStatus("saved");
+
       // Clear saved status after 2 seconds
-      setTimeout(() => setAutoSaveStatus('idle'), 2000);
+      setTimeout(() => setAutoSaveStatus("idle"), 2000);
     }, 500); // 500ms debounce
 
     const jexlDisposable = jexlEditor.onDidChangeModelContent(() => {
@@ -198,14 +219,14 @@ export function Playground() {
       setTimeout(() => {
         handleEvaluate();
         // Auto-save after evaluation
-        setAutoSaveStatus('saving');
+        setAutoSaveStatus("saving");
         const expression = jexlEditor.getValue();
         const contextText = contextEditor.getValue();
         autoSaveSession(expression, contextText);
-        setAutoSaveStatus('saved');
-        
+        setAutoSaveStatus("saved");
+
         // Clear saved status after 2 seconds
-        setTimeout(() => setAutoSaveStatus('idle'), 2000);
+        setTimeout(() => setAutoSaveStatus("idle"), 2000);
       }, 500);
     });
 
@@ -214,16 +235,16 @@ export function Playground() {
       setTimeout(() => {
         handleEvaluate();
         // Auto-save after evaluation
-        setAutoSaveStatus('saving');
+        setAutoSaveStatus("saving");
         const expression = jexlEditor.getValue();
         const contextText = contextEditor.getValue();
         autoSaveSession(expression, contextText);
-        setAutoSaveStatus('saved');
-        
+        setAutoSaveStatus("saved");
+
         // Clear saved status after 2 seconds
-        setTimeout(() => setAutoSaveStatus('idle'), 2000);
+        setTimeout(() => setAutoSaveStatus("idle"), 2000);
       }, 500);
-      
+
       // Reset context path when content changes
       setContextPath(null);
     });
@@ -246,7 +267,8 @@ export function Playground() {
   // Reset to defaults
   const resetToDefaults = () => {
     if (jexlEditor) jexlEditor.setValue(defaultExpression);
-    if (contextEditor) contextEditor.setValue(JSON.stringify(defaultContext, null, 2));
+    if (contextEditor)
+      contextEditor.setValue(JSON.stringify(defaultContext, null, 2));
     setContextPath(null);
   };
 
@@ -274,8 +296,17 @@ export function Playground() {
 
   // Handle deleting session
   const handleDeleteSession = (sessionId: string) => {
-    console.log('Playground: handleDeleteSession called with:', sessionId);
+    console.log("Playground: handleDeleteSession called with:", sessionId);
     deleteSession(sessionId);
+  };
+
+  // Handle updating session
+  const handleUpdateSession = (
+    sessionId: string,
+    expression: string,
+    context: string
+  ) => {
+    updateSession(sessionId, { expression, context });
   };
 
   return (
@@ -367,6 +398,9 @@ export function Playground() {
                   onLoadSession={handleLoadSession}
                   onSaveSession={handleSaveSession}
                   onDeleteSession={handleDeleteSession}
+                  onUpdateSession={handleUpdateSession}
+                  currentExpression={jexlEditor?.getValue() || ""}
+                  currentContext={contextEditor?.getValue() || ""}
                 />
 
                 {/* Examples */}
