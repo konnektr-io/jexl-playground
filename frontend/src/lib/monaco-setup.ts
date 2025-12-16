@@ -1,5 +1,5 @@
 import * as monaco from 'monaco-editor';
-import jexl, { Monaco } from 'jexl-extended';
+import { Monaco } from "jexl-extended";
 import { getLocation } from 'jsonc-parser';
 
 // Create Monaco editor instances
@@ -68,20 +68,6 @@ export function createReadOnlyEditor(container: HTMLElement, value: string = '',
     folding: true,
     readOnly: true,
   });
-}
-
-// Evaluate JEXL expression safely
-export async function evaluateJexl(expression: string, context: any): Promise<{ result: any; error: string | null }> {
-  try {
-    // Use type assertion to access jexl methods
-    const result = await (jexl as any).eval(expression, context);
-    return { result, error: null };
-  } catch (error) {
-    return { 
-      result: null, 
-      error: error instanceof Error ? error.message : String(error) 
-    };
-  }
 }
 
 // Parse JSON safely

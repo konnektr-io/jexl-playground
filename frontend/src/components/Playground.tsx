@@ -8,21 +8,21 @@ import {
   ResizablePanel,
   ResizableHandle,
 } from '@/components/ui/resizable';
-import { 
-  createJexlEditor, 
-  createJsonEditor, 
-  createReadOnlyEditor, 
-  evaluateJexl, 
-  parseJsonSafely, 
+import {
+  createJexlEditor,
+  createJsonEditor,
+  createReadOnlyEditor,
+  parseJsonSafely,
   formatResult,
-  getJsonPathFromOffset
-} from '@/lib/monaco-setup';
-import { Play, Copy, RefreshCw, FileText, Check, Clock } from 'lucide-react';
-import { SiGithub } from '@icons-pack/react-simple-icons';
-import { SavedSessions } from './SavedSessions';
-import { Examples } from './Examples';
-import { SaveDialog } from './SaveDialog';
-import { useSavedSessions } from '@/lib/saved-sessions';
+  getJsonPathFromOffset,
+} from "@/lib/monaco-setup";
+import { Play, Copy, RefreshCw, FileText, Check, Clock } from "lucide-react";
+import { SiGithub } from "@icons-pack/react-simple-icons";
+import { SavedSessions } from "./SavedSessions";
+import { Examples } from "./Examples";
+import { SaveDialog } from "./SaveDialog";
+import { useSavedSessions } from "@/lib/saved-sessions";
+import { evaluateJexl } from "@/lib/jexl";
 
 // Example data for the playground
 const defaultContext = {
