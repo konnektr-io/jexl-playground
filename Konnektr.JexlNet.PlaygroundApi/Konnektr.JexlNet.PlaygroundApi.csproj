@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="JexlNet" Version="2.9.2" />
+    <PackageReference Include="JexlNet.ExtendedGrammar" Version="2.9.2" />
+  </ItemGroup>
+</Project>
