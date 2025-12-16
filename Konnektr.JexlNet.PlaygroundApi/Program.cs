@@ -1,11 +1,16 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using JexlNet;
-using JexlNet.ExtendedGrammar;
+using Konnektr.JexlNet.PlaygroundApi.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
 var app = builder.Build();
 var jexl = new Jexl(new ExtendedGrammar());
 
@@ -40,15 +45,3 @@ app.MapGet(
 );
 
 app.Run();
-
-public class EvalRequest
-{
-    public string Expression { get; set; } = string.Empty;
-    public object Context { get; set; } = new();
-}
-
-public class EvalResponse
-{
-    public object? Result { get; set; }
-    public string? Error { get; set; }
-}
