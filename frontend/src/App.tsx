@@ -1,4 +1,4 @@
-import { Playground } from '@/components/Playground'
+import { Playground } from "@/components/Playground";
 import { CookieConsent } from "@/components/cookie-consent";
 
 function App() {
@@ -22,6 +22,25 @@ function App() {
           gtag("consent", "update", {
             ad_storage: "denied",
             analytics_storage: "denied",
+          });
+        }
+      }
+      type ClarityFn = (
+        command: string,
+        params: Record<string, string>
+      ) => void;
+      const clarity = (window as typeof window & { clarity?: ClarityFn })
+        .clarity;
+      if (clarity) {
+        if (consent === "accepted") {
+          clarity("consentv2", {
+            ad_Storage: "granted",
+            analytics_Storage: "granted",
+          });
+        } else {
+          clarity("consentv2", {
+            ad_Storage: "denied",
+            analytics_Storage: "denied",
           });
         }
       }
@@ -51,4 +70,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

@@ -57,6 +57,7 @@ jobs:
         env:
           NODE_ENV: production
           VITE_GTM_ID: ${{ secrets.GTAG }}
+        working-directory: ./frontend
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -64,7 +65,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ./frontend/dist
 
   # Deployment job
   deploy:
