@@ -40,7 +40,7 @@ app.MapPost(
 );
 
 app.MapGet(
-    "/",
+    "/healthz",
     () => Results.Json(new { status = "ok", message = "JexlNet.ExtendedGrammar API running" })
 );
 

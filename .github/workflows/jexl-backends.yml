@@ -4,6 +4,7 @@ on:
     push:
         branches: [main]
         paths:
+            - "frontend/**"
             - "backend-python/**"
             - "Konnektr.JexlNet.PlaygroundApi/**"
             - ".github/workflows/jexl-backends.yml"
@@ -36,22 +37,46 @@ jobs:
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
 
+            - name: Extract Python backend metadata
+              id: meta_py
+              uses: docker/metadata-action@v5
+              with:
+                images: ghcr.io/${{ env.IMAGE_PY }}
+                tags: |
+                  type=ref,event=branch
+                  type=ref,event=pr
+                  type=semver,pattern={{version}}
+                  type=semver,pattern={{major}}.{{minor}}
+                  type=semver,pattern={{major}}
+                  type=raw,value=latest,enable={{is_default_branch}}
+
             - name: Build and push Python backend
               uses: docker/build-push-action@v5
               with:
-                  context: ./backend-python
-                  file: ./backend-python/Dockerfile
-                  push: true
-                  tags: |
-                      ghcr.io/${{ env.IMAGE_PY }}:latest
-                      ghcr.io/${{ env.IMAGE_PY }}:${{ github.sha }}
+                context: ./backend-python
+                file: ./backend-python/Dockerfile
+                push: true
+                tags: ${{ steps.meta_py.outputs.tags }}
+                labels: ${{ steps.meta_py.outputs.labels }}
+
+            - name: Extract C# backend metadata
+              id: meta_cs
+              uses: docker/metadata-action@v5
+              with:
+                images: ghcr.io/${{ env.IMAGE_CS }}
+                tags: |
+                  type=ref,event=branch
+                  type=ref,event=pr
+                  type=semver,pattern={{version}}
+                  type=semver,pattern={{major}}.{{minor}}
+                  type=semver,pattern={{major}}
+                  type=raw,value=latest,enable={{is_default_branch}}
 
             - name: Build and push C# backend
               uses: docker/build-push-action@v5
               with:
-                  context: .
-                  file: ./Konnektr.JexlNet.PlaygroundApi/Dockerfile
-                  push: true
-                  tags: |
-                      ghcr.io/${{ env.IMAGE_CS }}:latest
-                      ghcr.io/${{ env.IMAGE_CS }}:${{ github.sha }}
+                context: .
+                file: ./Konnektr.JexlNet.PlaygroundApi/Dockerfile
+                push: true
+                tags: ${{ steps.meta_cs.outputs.tags }}
+                labels: ${{ steps.meta_cs.outputs.labels }}
