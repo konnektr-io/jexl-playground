@@ -368,7 +368,7 @@ export function Playground() {
                 <a
                   href="https://docs.konnektr.io/docs/jexl"
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener"
                   className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <FileText className="h-3 w-3" />
