@@ -15,7 +15,7 @@ var app = builder.Build();
 var jexl = new Jexl(new ExtendedGrammar());
 
 app.MapPost(
-    "/evaluate",
+    "/evaluate-cs",
     async (HttpRequest request) =>
     {
         try

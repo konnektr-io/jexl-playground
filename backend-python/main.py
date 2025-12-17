@@ -20,7 +20,7 @@ class EvalResponse(BaseModel):
 jexl = JexlExtended()
 
 
-@app.post("/evaluate", response_model=EvalResponse)
+@app.post("/evaluate-python", response_model=EvalResponse)
 async def evaluate(req: EvalRequest):
     try:
         result = jexl.evaluate(req.expression, req.context)
