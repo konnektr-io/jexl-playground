@@ -395,6 +395,13 @@ export function Playground() {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              {/* Auto-save status indicator */}
+              {autoSaveStatus === "saving" && (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Clock className="h-3 w-3" />
+                  Saving...
+                </div>
+              )}
               {/* Runtime selection UI */}
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground">Runtime:</span>
@@ -420,13 +427,6 @@ export function Playground() {
                   </SelectContent>
                 </Select>
               </div>
-              {/* Auto-save status indicator */}
-              {autoSaveStatus === "saving" && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Clock className="h-3 w-3" />
-                  Saving...
-                </div>
-              )}
               {autoSaveStatus === "saved" && (
                 <div className="flex items-center gap-2 text-xs text-green-600">
                   <Check className="h-3 w-3" />

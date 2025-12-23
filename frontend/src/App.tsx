@@ -3,7 +3,7 @@ import { CookieConsent } from "@/components/cookie-consent";
 
 function App() {
   // Set GTM consent using gtag API
-  const setGtmConsent = (consent: "accepted" | "declined") => {
+  const setConsent = (consent: "accepted" | "declined") => {
     if (typeof window !== "undefined") {
       // Declare window.gtag for TypeScript
       type GtagFn = (
@@ -49,12 +49,12 @@ function App() {
 
   // Callback for accepting cookies
   const handleAccept = () => {
-    setGtmConsent("accepted");
+    setConsent("accepted");
   };
 
   // Callback for declining cookies
   const handleDecline = () => {
-    setGtmConsent("declined");
+    setConsent("declined");
   };
 
   return (
