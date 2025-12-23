@@ -17,6 +17,7 @@ import {
   createJexlEditor,
   createJsonEditor,
   createReadOnlyEditor,
+  handleEditorDidMount,
   parseJsonSafely,
   formatResult,
   getJsonPathFromOffset,
@@ -101,6 +102,8 @@ export function Playground() {
 
     // Create editors
     const jexl = createJexlEditor(jexlEditorRef.current, defaultExpression);
+    handleEditorDidMount(jexl);
+
     const context = createJsonEditor(
       contextEditorRef.current,
       JSON.stringify(defaultContext, null, 2),
@@ -111,7 +114,10 @@ export function Playground() {
         setContextPath(path);
       }
     );
+    handleEditorDidMount(context);
+
     const output = createReadOnlyEditor(outputEditorRef.current, "", "json");
+    handleEditorDidMount(output);
 
     setJexlEditor(jexl);
     setContextEditor(context);
