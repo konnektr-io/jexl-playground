@@ -22,7 +22,7 @@ import {
   getJsonPathFromOffset,
 } from "@/lib/monaco-setup";
 import { Play, Copy, RefreshCw, FileText, Check, Clock } from "lucide-react";
-import { SiGithub } from "@icons-pack/react-simple-icons";
+// import { SiGithub } from "@icons-pack/react-simple-icons";
 import { SavedSessions } from "./SavedSessions";
 import { Examples } from "./Examples";
 import { SaveDialog } from "./SaveDialog";
