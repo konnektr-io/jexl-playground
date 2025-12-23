@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from "react";
 import {
   Select,
   SelectTrigger,
@@ -164,19 +164,18 @@ export function Playground() {
       let error: string | null = null;
 
       try {
-        if (runtime === 'js') {
+        if (runtime === "js") {
           // In-browser JS evaluation
           const evalResult = await evaluateJexl(expression, context);
           result = evalResult.result;
           error = evalResult.error;
         } else {
           // Backend API call with explicit path
-          const backendUrl = runtime === 'python'
-            ? '/evaluate-python'
-            : '/evaluate-cs';
+          const backendUrl =
+            runtime === "python" ? "/evaluate-python" : "/evaluate-cs";
           const resp = await fetch(backendUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ expression, context }),
           });
           const data = await resp.json();
@@ -190,24 +189,24 @@ export function Playground() {
       if (error) {
         setLastError(error);
         outputEditor?.setValue(`Error: ${error}`);
-        outputEditor?.updateOptions({ language: 'text' });
+        outputEditor?.updateOptions({ language: "text" });
       } else {
         const formattedResult = formatResult(result);
         outputEditor?.setValue(formattedResult);
         outputEditor?.updateOptions({
-          language: typeof result === 'string' ? 'text' : 'json',
+          language: typeof result === "string" ? "text" : "json",
         });
 
         // Determine output type
         const getTypeInfo = (value: any): string => {
-          if (value === null) return 'null';
-          if (value === undefined) return 'undefined';
+          if (value === null) return "null";
+          if (value === undefined) return "undefined";
           if (Array.isArray(value)) return `array[${value.length}]`;
-          if (typeof value === 'object') return 'object';
-          if (typeof value === 'string') return `string`;
-          if (typeof value === 'number')
-            return Number.isInteger(value) ? 'integer' : 'number';
-          if (typeof value === 'boolean') return 'boolean';
+          if (typeof value === "object") return "object";
+          if (typeof value === "string") return `string`;
+          if (typeof value === "number")
+            return Number.isInteger(value) ? "integer" : "number";
+          if (typeof value === "boolean") return "boolean";
           return typeof value;
         };
 
@@ -358,41 +357,22 @@ export function Playground() {
         <div className="flex-none border-b p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">
-                JEXL Playground
-              </h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-bold tracking-tight">
+                  JEXL Playground
+                </h1>
+                <a
+                  href="https://konnektr.io?utm_source=jexl-playground&utm_medium=referral&utm_campaign=header-branding"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  by Konnektr →
+                </a>
+              </div>
               <p className="text-muted-foreground">
                 Interactive playground for JEXL Extended expressions
               </p>
-              <div className="flex items-center gap-4 mt-2">
-                <a
-                  href="https://docs.konnektr.io/docs/jexl"
-                  target="_blank"
-                  rel="noopener"
-                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <FileText className="h-3 w-3" />
-                  Documentation
-                </a>
-                <a
-                  href="https://github.com/konnektr-io/jexl-playground"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <SiGithub className="h-3 w-3" />
-                  Playground Source
-                </a>
-                <a
-                  href="https://github.com/konnektr-io/jexl-extended"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <SiGithub className="h-3 w-3" />
-                  JEXL Extended Library
-                </a>
-              </div>
             </div>
             <div className="flex items-center gap-4">
               {/* Auto-save status indicator */}
@@ -589,6 +569,71 @@ export function Playground() {
               </ResizablePanelGroup>
             </ResizablePanel>
           </ResizablePanelGroup>
+        </div>
+
+        {/* Footer */}
+        <div className="flex-none border-t px-6 py-3 bg-muted/30">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <div className="flex items-center gap-4">
+              <span>© 2025 Konnektr</span>
+              <span>•</span>
+              <a
+                href="https://konnektr.io?utm_source=jexl-playground&utm_medium=referral&utm_campaign=footer"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors"
+              >
+                Visit Konnektr.io
+              </a>
+              <span>•</span>
+              <a
+                href="https://docs.konnektr.io?utm_source=jexl-playground&utm_medium=referral&utm_campaign=footer-docs"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors"
+              >
+                Documentation
+              </a>
+              <span>•</span>
+              <a
+                href="https://github.com/konnektr-io?utm_source=jexl-playground&utm_medium=referral&utm_campaign=footer-github"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors"
+              >
+                GitHub
+              </a>
+            </div>
+            <div className="flex items-center gap-2">
+              <span>Available runtimes:</span>
+              <a
+                href="https://github.com/konnektr-io/jexl-extended?utm_source=jexl-playground&utm_medium=referral&utm_campaign=footer-js"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors"
+              >
+                JS
+              </a>
+              <span>•</span>
+              <a
+                href="https://github.com/konnektr-io/pyjexl-extended?utm_source=jexl-playground&utm_medium=referral&utm_campaign=footer-python"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors"
+              >
+                Python
+              </a>
+              <span>•</span>
+              <a
+                href="https://github.com/konnektr-io/Jexlnet?utm_source=jexl-playground&utm_medium=referral&utm_campaign=footer-csharp"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors"
+              >
+                C#
+              </a>
+            </div>
+          </div>
         </div>
       </div>
 
