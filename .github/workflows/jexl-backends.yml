@@ -55,7 +55,7 @@ jobs:
       - name: Build and push Python backend
         uses: docker/build-push-action@v5
         with:
-          context: ./backend-python
+          context: .
           file: ./backend-python/Dockerfile
           push: true
           tags: ${{ steps.meta_py.outputs.tags }}

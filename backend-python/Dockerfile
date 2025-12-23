@@ -4,9 +4,9 @@ WORKDIR /app/frontend
 ARG GTM_ID="GTM-PLACEHOLDER"
 ENV VITE_GTM_ID=$GTM_ID
 
-COPY ../frontend/package.json ../frontend/pnpm-lock.yaml ./
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
 RUN npm install -g pnpm && pnpm install --dangerously-allow-all-builds
-COPY ../frontend/ .
+COPY frontend/ .
 RUN chmod +x node_modules/.bin/*
 ENV NODE_OPTIONS=--max-old-space-size=8192
 RUN echo "Building with VITE_GTM_ID: $VITE_GTM_ID"
@@ -15,9 +15,9 @@ RUN pnpm run build
 # --- Build backend ---
 FROM python:3.11-slim AS backend-build
 WORKDIR /app/backend
-COPY requirements.txt ./
+COPY backend-python/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
+COPY backend-python/ .
 
 # --- Final image ---
 FROM python:3.11-slim
