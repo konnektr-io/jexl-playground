@@ -1,0 +1,84 @@
+name: Build and Push JEXL Playground Backends
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_PY: ${{ github.repository }}/backend-python
+      IMAGE_CS: ${{ github.repository }}/backend-csharp
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Python backend metadata
+        id: meta_py
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ env.IMAGE_PY }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Python backend
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./backend-python/Dockerfile
+          push: true
+          tags: ${{ steps.meta_py.outputs.tags }}
+          labels: ${{ steps.meta_py.outputs.labels }}
+
+      - name: Extract C# backend metadata
+        id: meta_cs
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ env.IMAGE_CS }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push C# backend
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Konnektr.JexlNet.PlaygroundApi/Dockerfile
+          push: true
+          tags: ${{ steps.meta_cs.outputs.tags }}
+          labels: ${{ steps.meta_cs.outputs.labels }}

@@ -1,28 +1,33 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
 import {
-  TooltipProvider,
-} from '@/components/ui/tooltip';
-import { 
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import {
   ResizablePanelGroup,
   ResizablePanel,
   ResizableHandle,
-} from '@/components/ui/resizable';
-import { 
-  createJexlEditor, 
-  createJsonEditor, 
-  createReadOnlyEditor, 
-  evaluateJexl, 
-  parseJsonSafely, 
+} from "@/components/ui/resizable";
+import {
+  createJexlEditor,
+  createJsonEditor,
+  createReadOnlyEditor,
+  parseJsonSafely,
   formatResult,
-  getJsonPathFromOffset
-} from '@/lib/monaco-setup';
-import { Play, Copy, RefreshCw, FileText, Check, Clock } from 'lucide-react';
-import { SiGithub } from '@icons-pack/react-simple-icons';
-import { SavedSessions } from './SavedSessions';
-import { Examples } from './Examples';
-import { SaveDialog } from './SaveDialog';
-import { useSavedSessions } from '@/lib/saved-sessions';
+  getJsonPathFromOffset,
+} from "@/lib/monaco-setup";
+import { Play, Copy, RefreshCw, FileText, Check, Clock } from "lucide-react";
+import { SiGithub } from "@icons-pack/react-simple-icons";
+import { SavedSessions } from "./SavedSessions";
+import { Examples } from "./Examples";
+import { SaveDialog } from "./SaveDialog";
+import { useSavedSessions } from "@/lib/saved-sessions";
+import { evaluateJexl } from "@/lib/jexl";
 
 // Example data for the playground
 const defaultContext = {
@@ -30,37 +35,49 @@ const defaultContext = {
     { name: "Alice", age: 28, active: true, department: "Engineering" },
     { name: "Bob", age: 32, active: false, department: "Sales" },
     { name: "Charlie", age: 24, active: true, department: "Marketing" },
-    { name: "Diana", age: 30, active: true, department: "Engineering" }
+    { name: "Diana", age: 30, active: true, department: "Engineering" },
   ],
   products: [
     { name: "Laptop", price: 999.99, category: "Electronics", inStock: true },
     { name: "Book", price: 19.99, category: "Education", inStock: false },
-    { name: "Coffee", price: 4.50, category: "Food", inStock: true }
+    { name: "Coffee", price: 4.5, category: "Food", inStock: true },
   ],
   settings: {
     theme: "dark",
     language: "en",
-    notifications: true
-  }
+    notifications: true,
+  },
 };
 
-const defaultExpression = 'users|filter(\'value.active\')|map(\'value.name\')|sort()';
+const defaultExpression =
+  "users|filter('value.active')|map('value.name')|sort()";
+
+// Supported runtimes
+const RUNTIMES = [
+  { label: "JavaScript (Browser)", value: "js" },
+  { label: "Python (Server)", value: "python" },
+  { label: "C# (Server)", value: "csharp" },
+];
 
 export function Playground() {
+  // Runtime selection state
+  const [runtime, setRuntime] = useState<"js" | "python" | "csharp">("js");
   const jexlEditorRef = useRef<HTMLDivElement>(null);
   const contextEditorRef = useRef<HTMLDivElement>(null);
   const outputEditorRef = useRef<HTMLDivElement>(null);
-  
+
   const [jexlEditor, setJexlEditor] = useState<any>(null);
   const [contextEditor, setContextEditor] = useState<any>(null);
   const [outputEditor, setOutputEditor] = useState<any>(null);
-  
+
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
   const [outputType, setOutputType] = useState<string | null>(null);
   const [contextPath, setContextPath] = useState<string | null>(null);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
-  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [autoSaveStatus, setAutoSaveStatus] = useState<
+    "idle" | "saving" | "saved"
+  >("idle");
 
   // Saved sessions hook
   const {
@@ -143,29 +160,54 @@ export function Playground() {
       setLastError(null);
       setOutputType(null);
 
-      const { result, error } = await evaluateJexl(expression, context);
+      let result: any = null;
+      let error: string | null = null;
+
+      try {
+        if (runtime === 'js') {
+          // In-browser JS evaluation
+          const evalResult = await evaluateJexl(expression, context);
+          result = evalResult.result;
+          error = evalResult.error;
+        } else {
+          // Backend API call with explicit path
+          const backendUrl = runtime === 'python'
+            ? '/evaluate-python'
+            : '/evaluate-cs';
+          const resp = await fetch(backendUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ expression, context }),
+          });
+          const data = await resp.json();
+          result = data.result;
+          error = data.error;
+        }
+      } catch (err: any) {
+        error = err?.message || String(err);
+      }
 
       if (error) {
         setLastError(error);
         outputEditor?.setValue(`Error: ${error}`);
-        outputEditor?.updateOptions({ language: "text" });
+        outputEditor?.updateOptions({ language: 'text' });
       } else {
         const formattedResult = formatResult(result);
         outputEditor?.setValue(formattedResult);
         outputEditor?.updateOptions({
-          language: typeof result === "string" ? "text" : "json",
+          language: typeof result === 'string' ? 'text' : 'json',
         });
 
         // Determine output type
         const getTypeInfo = (value: any): string => {
-          if (value === null) return "null";
-          if (value === undefined) return "undefined";
+          if (value === null) return 'null';
+          if (value === undefined) return 'undefined';
           if (Array.isArray(value)) return `array[${value.length}]`;
-          if (typeof value === "object") return "object";
-          if (typeof value === "string") return `string`;
-          if (typeof value === "number")
-            return Number.isInteger(value) ? "integer" : "number";
-          if (typeof value === "boolean") return "boolean";
+          if (typeof value === 'object') return 'object';
+          if (typeof value === 'string') return `string`;
+          if (typeof value === 'number')
+            return Number.isInteger(value) ? 'integer' : 'number';
+          if (typeof value === 'boolean') return 'boolean';
           return typeof value;
         };
 
@@ -174,7 +216,7 @@ export function Playground() {
 
       setIsEvaluating(false);
     },
-    [outputEditor]
+    [outputEditor, runtime]
   );
 
   // Handle manual evaluation
@@ -326,7 +368,7 @@ export function Playground() {
                 <a
                   href="https://docs.konnektr.io/docs/jexl"
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener"
                   className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <FileText className="h-3 w-3" />
@@ -353,6 +395,31 @@ export function Playground() {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              {/* Runtime selection UI */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">Runtime:</span>
+                <Select
+                  value={runtime}
+                  onValueChange={(val) =>
+                    setRuntime(val as "js" | "python" | "csharp")
+                  }
+                >
+                  <SelectTrigger className="w-[180px] h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {RUNTIMES.map((rt) => (
+                      <SelectItem
+                        key={rt.value}
+                        value={rt.value}
+                        className="text-xs"
+                      >
+                        {rt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               {/* Auto-save status indicator */}
               {autoSaveStatus === "saving" && (
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
