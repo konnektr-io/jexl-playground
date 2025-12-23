@@ -388,6 +388,12 @@ export function Playground() {
                   Saving...
                 </div>
               )}
+              {autoSaveStatus === "saved" && (
+                <div className="flex items-center gap-2 text-xs text-green-600">
+                  <Check className="h-3 w-3" />
+                  Auto-saved
+                </div>
+              )}
               {/* Runtime selection UI */}
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground">Runtime:</span>
@@ -413,12 +419,6 @@ export function Playground() {
                   </SelectContent>
                 </Select>
               </div>
-              {autoSaveStatus === "saved" && (
-                <div className="flex items-center gap-2 text-xs text-green-600">
-                  <Check className="h-3 w-3" />
-                  Auto-saved
-                </div>
-              )}
 
               <div className="flex gap-2">
                 <Button onClick={handleEvaluate} disabled={isEvaluating}>
